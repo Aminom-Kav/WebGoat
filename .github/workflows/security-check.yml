@@ -1,0 +1,28 @@
+name: Security Check
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  security-scan:
+    runs-on: ubuntu-latest
+    container:
+      image: semgrep/semgrep
+    
+    if: (github.actor != 'dependabot[bot]') 
+    steps:
+       - name: Checkout Code
+         uses: actions/checkout@v4
+       - name: SetUp ReviewDog
+         uses: reviewdog/action-setup@v1
+       - name: Run SemgrepScan
+         run: semgrep scan --config p/java --quiet --oss-only --sarif --sarif-output=sast-finding.json
+       - name: Add checks at PR
+         env: 
+          REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+         run: cat sast-finding.json | reviewdog -f=sarif -diff="git diff develop" -reporter=github-pr-review

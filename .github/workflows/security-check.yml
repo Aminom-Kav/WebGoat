@@ -11,8 +11,6 @@ permissions:
 jobs:
   security-scan:
     runs-on: ubuntu-latest
-    container:
-      image: semgrep/semgrep
     
     if: (github.actor != 'dependabot[bot]') 
     steps:
@@ -24,7 +22,8 @@ jobs:
          uses: bearer/bearer-action@v2
          with:
           format: rdjson
-          output: rd.json 
+          output: rd.json
+          diff: true 
        - name: Add findings to PR
          if: always()
          env: 

@@ -11,7 +11,6 @@ permissions:
 jobs:
   security-scan:
     runs-on: ubuntu-latest
-    continue-on-error: true
     container:
       image: semgrep/semgrep
     
@@ -24,6 +23,7 @@ jobs:
        - name: Run SemgrepScan
          run: semgrep scan --config p/java --quiet --oss-only --sarif --sarif-output=sast-finding.json 
        - name: Add checks at PR
+         if: always()
          env: 
           REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
          run: cat sast-finding.json | reviewdog -f=sarif -diff="git diff develop" -reporter=github-pr-review

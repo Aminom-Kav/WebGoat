@@ -30,6 +30,7 @@ jobs:
           REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
          run: cat findings.json | reviewdog -f=sarif -reporter=github-pr-review
        - name: Automatic Approval
+         if: always()
          uses: actions/github-script@v4
          with:
           script: |
